@@ -3,3 +3,9 @@ storage/
 *.json
 node_modules/
 .env
+*.log
+server_err.txt
+server_out.txt
+stderr.txt
+stdout.txt
+index/
