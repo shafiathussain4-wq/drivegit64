@@ -21,6 +21,8 @@ db.exec(`CREATE TABLE IF NOT EXISTS users (
 try { db.exec('ALTER TABLE users ADD COLUMN admin INTEGER NOT NULL DEFAULT 0'); } catch (e) {}
 // Add google_id column if missing
 try { db.exec('ALTER TABLE users ADD COLUMN google_id TEXT'); } catch (e) {}
+// Add github_id column if missing
+try { db.exec('ALTER TABLE users ADD COLUMN github_id TEXT'); } catch (e) {}
 
 db.exec(`CREATE TABLE IF NOT EXISTS sessions (
   token TEXT PRIMARY KEY,
@@ -87,10 +89,12 @@ migrate();
 
 const getUser = db.prepare('SELECT * FROM users WHERE email = ?');
 const getUserByGoogleId = db.prepare('SELECT * FROM users WHERE google_id = ?');
+const getUserByGitHubId = db.prepare('SELECT * FROM users WHERE github_id = ?');
 const getUserByToken = db.prepare('SELECT * FROM users WHERE verify_token = ?');
 const insertUser = db.prepare('INSERT INTO users (email, name, password_hash, salt, created_at, verified, verify_token) VALUES (?, ?, ?, ?, ?, ?, ?)');
 const updateUser = db.prepare('UPDATE users SET verified = ?, verify_token = ? WHERE email = ?');
 const linkGoogleId = db.prepare('UPDATE users SET google_id = ?, verified = 1 WHERE email = ?');
+const linkGitHubId = db.prepare('UPDATE users SET github_id = ?, verified = 1 WHERE email = ?');
 const getSession = db.prepare('SELECT sessions.*, users.name, users.admin FROM sessions JOIN users ON sessions.email = users.email WHERE sessions.token = ?');
 const insertSession = db.prepare('INSERT INTO sessions (token, email, created_at) VALUES (?, ?, ?)');
 const deleteSession = db.prepare('DELETE FROM sessions WHERE token = ?');
@@ -129,12 +133,22 @@ module.exports = {
   findUserByGoogleId(googleId) {
     return getUserByGoogleId.get(googleId) || null;
   },
+  findUserByGitHubId(githubId) {
+    return getUserByGitHubId.get(githubId) || null;
+  },
   createGoogleUser(email, name, googleId) {
     const ins = db.prepare('INSERT INTO users (email, name, password_hash, salt, created_at, verified, verify_token, google_id) VALUES (?, ?, ?, ?, ?, 1, NULL, ?)');
     ins.run(email, name, '', '', new Date().toISOString(), googleId);
   },
+  createGitHubUser(email, name, githubId) {
+    const ins = db.prepare('INSERT INTO users (email, name, password_hash, salt, created_at, verified, verify_token, github_id) VALUES (?, ?, ?, ?, ?, 1, NULL, ?)');
+    ins.run(email, name, '', '', new Date().toISOString(), githubId);
+  },
   linkGoogleAccount(email, googleId) {
     linkGoogleId.run(googleId, email);
+  },
+  linkGitHubAccount(email, githubId) {
+    linkGitHubId.run(githubId, email);
   },
 
   // Sessions

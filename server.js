@@ -166,6 +166,66 @@ function fetchGoogleUser(accessToken) {
     });
 }
 
+// === GITHUB OAUTH ===
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || '';
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '';
+
+function getGitHubAuthUrl(host) {
+    const redirectUri = `http${host.includes('localhost') ? '' : 's'}://${host}/api/auth/github/callback`;
+    const params = new URLSearchParams({
+        client_id: GITHUB_CLIENT_ID,
+        redirect_uri: redirectUri,
+        scope: 'read:user user:email',
+    });
+    return `https://github.com/login/oauth/authorize?${params}`;
+}
+
+function exchangeGitHubCode(code, host) {
+    return new Promise((resolve, reject) => {
+        const redirectUri = `http${host.includes('localhost') ? '' : 's'}://${host}/api/auth/github/callback`;
+        const body = JSON.stringify({
+            client_id: GITHUB_CLIENT_ID,
+            client_secret: GITHUB_CLIENT_SECRET,
+            code,
+            redirect_uri: redirectUri,
+        });
+        const https = require('https');
+        const req = https.request({
+            hostname: 'github.com', path: '/login/oauth/access_token', method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+        }, res => {
+            let data = '';
+            res.on('data', c => data += c);
+            res.on('end', () => { try { resolve(JSON.parse(data)); } catch (e) { reject(new Error('Failed to parse token response')); } });
+        });
+        req.on('error', reject);
+        req.write(body);
+        req.end();
+    });
+}
+
+function fetchGitHubUser(accessToken) {
+    return new Promise((resolve, reject) => {
+        const https = require('https');
+        https.get('https://api.github.com/user', { headers: { Authorization: 'Bearer ' + accessToken, 'User-Agent': 'Drive-App' } }, res => {
+            let data = '';
+            res.on('data', c => data += c);
+            res.on('end', () => { try { resolve(JSON.parse(data)); } catch (e) { reject(new Error('Failed to parse user info')); } });
+        }).on('error', reject);
+    });
+}
+
+function fetchGitHubEmail(accessToken) {
+    return new Promise((resolve, reject) => {
+        const https = require('https');
+        https.get('https://api.github.com/user/emails', { headers: { Authorization: 'Bearer ' + accessToken, 'User-Agent': 'Drive-App' } }, res => {
+            let data = '';
+            res.on('data', c => data += c);
+            res.on('end', () => { try { resolve(JSON.parse(data)); } catch (e) { reject(new Error('Failed to parse emails')); } });
+        }).on('error', reject);
+    });
+}
+
 function sendEmail(to, subject, html) {
     return new Promise((resolve, reject) => {
         const cfg = emailConfig;
@@ -685,6 +745,62 @@ const server = http.createServer(async (req, res) => {
                 res.end();
             } catch (err) {
                 console.error('Google OAuth error:', err);
+                res.writeHead(500, { 'Content-Type': 'text/html' });
+                res.end('<html><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0a14;color:#fff"><div style="text-align:center"><h2>Authentication failed</h2><p>' + (err.message || 'Unknown error') + '</p><p><a href="/" style="color:#8ab4f8">Try again</a></p></div></body></html>');
+            }
+            return;
+        }
+
+        // GET /api/auth/github/config
+        if (pathname === '/api/auth/github/config' && req.method === 'GET') {
+            return respond(res, 200, { enabled: !!GITHUB_CLIENT_ID });
+        }
+
+        // GET /api/auth/github — redirect to GitHub OAuth
+        if (pathname === '/api/auth/github' && req.method === 'GET') {
+            if (!GITHUB_CLIENT_ID) { res.writeHead(302, { Location: '/?error=github_not_configured' }); res.end(); return; }
+            const authUrl = getGitHubAuthUrl(req.headers.host || 'localhost:3000');
+            res.writeHead(302, { Location: authUrl });
+            res.end();
+            return;
+        }
+
+        // GET /api/auth/github/callback — handle GitHub OAuth callback
+        if (pathname === '/api/auth/github/callback' && req.method === 'GET') {
+            if (!GITHUB_CLIENT_ID) { res.writeHead(400, { 'Content-Type': 'text/html' }); res.end('GitHub Sign-In not configured'); return; }
+            const code = query.get('code');
+            const err = query.get('error');
+            if (err) { res.writeHead(400, { 'Content-Type': 'text/html' }); res.end('<html><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0a14;color:#fff"><div style="text-align:center"><h2>Sign in cancelled</h2><p><a href="/" style="color:#8ab4f8">Go back</a></p></div></body></html>'); return; }
+            if (!code) { res.writeHead(400, { 'Content-Type': 'text/html' }); res.end('Missing authorization code'); return; }
+            try {
+                const tokenData = await exchangeGitHubCode(code, req.headers.host || 'localhost:3000');
+                if (tokenData.error) { res.writeHead(400, { 'Content-Type': 'text/html' }); res.end('GitHub auth error: ' + tokenData.error_description || tokenData.error); return; }
+                const ghUser = await fetchGitHubUser(tokenData.access_token);
+                if (!ghUser || !ghUser.id) { res.writeHead(400, { 'Content-Type': 'text/html' }); res.end('Failed to get user info from GitHub'); return; }
+                let email = ghUser.email;
+                if (!email) {
+                    const emails = await fetchGitHubEmail(tokenData.access_token);
+                    if (emails && emails.length) email = emails.find(e => e.primary)?.email || emails[0].email;
+                }
+                if (!email) { res.writeHead(400, { 'Content-Type': 'text/html' }); res.end('Could not retrieve email from GitHub. Make sure your GitHub email is public.'); return; }
+                const ghId = String(ghUser.id);
+                let dbUser = db.findUserByGitHubId(ghId);
+                if (!dbUser) {
+                    dbUser = db.findUser(email);
+                    if (dbUser) {
+                        db.linkGitHubAccount(email, ghId);
+                    } else {
+                        const isFirst = db.listAllUsers().length === 0;
+                        db.createGitHubUser(email, ghUser.login || email.split('@')[0], ghId);
+                        if (isFirst) db.setAdmin(email, 1);
+                    }
+                }
+                const token = createSession({ email });
+                setCookie(res, 'session', token);
+                res.writeHead(302, { Location: '/drive' });
+                res.end();
+            } catch (err) {
+                console.error('GitHub OAuth error:', err);
                 res.writeHead(500, { 'Content-Type': 'text/html' });
                 res.end('<html><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0a14;color:#fff"><div style="text-align:center"><h2>Authentication failed</h2><p>' + (err.message || 'Unknown error') + '</p><p><a href="/" style="color:#8ab4f8">Try again</a></p></div></body></html>');
             }
