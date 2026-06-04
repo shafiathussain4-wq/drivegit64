@@ -267,6 +267,11 @@ function doSignup() {
   });
 }
 
+// Auto-redirect to drive if already signed in
+fetch('/api/auth/me', { credentials: 'same-origin' }).then(r => r.json()).then(d => {
+  if (d.authenticated) window.location.href = '/drive';
+}).catch(() => {});
+
 el('authForm').addEventListener('submit', e => {
   e.preventDefault();
   authMode === 'signin' ? doSignin() : doSignup();

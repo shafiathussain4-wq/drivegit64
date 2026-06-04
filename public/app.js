@@ -28,14 +28,13 @@ const API = {
 
 // === AUTH ===
 let currentUser = null;
-let authMode = 'signin';
 
 function checkAuth() {
   return fetch('/api/auth/me', { credentials: 'same-origin' })
     .then(r => r.json())
     .then(data => {
       if (data.authenticated === false || data.error) {
-        showLogin();
+        window.location.href = '/';
         return false;
       }
       currentUser = data;
@@ -45,18 +44,16 @@ function checkAuth() {
       return true;
     })
     .catch(() => {
-      showLogin();
+      window.location.href = '/';
       return false;
     });
 }
 
 function showLogin() {
-  el('loginScreen').style.display = 'flex';
-  el('driveApp').style.display = 'none';
+  window.location.href = '/';
 }
 
 function showDrive() {
-  el('loginScreen').style.display = 'none';
   el('driveApp').style.display = 'flex';
 }
 
@@ -65,78 +62,12 @@ function updateUserInfo(user) {
   el('userEmail').textContent = user.email;
 }
 
-// Auth tabs
-document.querySelectorAll('.auth-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    authMode = tab.dataset.tab;
-    el('signinFields').style.display = authMode === 'signin' ? 'block' : 'none';
-    el('signupFields').style.display = authMode === 'signup' ? 'block' : 'none';
-    el('loginSubtitle').textContent = authMode === 'signin' ? 'Sign in to your account' : 'Create a new account';
-    el('authError').textContent = '';
-  });
-});
-
-// Auth helpers
-function doSignin() {
-  const email = el('signinEmail').value.trim();
-  const password = el('signinPassword').value;
-  el('authError').textContent = '';
-  el('authError').style.color = '';
-  if (!email || !password) { el('authError').textContent = 'Please fill in all fields'; return; }
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
-  fetch('/api/auth/signin', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-    credentials: 'same-origin',
-    signal: controller.signal,
-  })
-  .then(r => { clearTimeout(timer); return r.json(); })
-  .then(data => {
-    if (data.error) { el('authError').textContent = data.error; return; }
-    if (data.success) { currentUser = data.user; showDrive(); updateUserInfo(data.user); loadFolder(''); loadStats(); }
-  })
-  .catch(err => {
-    clearTimeout(timer);
-    el('authError').textContent = err.name === 'AbortError' ? 'Request timed out' : 'Connection error';
-  });
-}
-function doSignup() {
-  const name = el('signupName').value.trim();
-  const email = el('signupEmail').value.trim();
-  const password = el('signupPassword').value;
-  el('authError').textContent = '';
-  if (!name || !email || !password) { el('authError').textContent = 'Please fill in all fields'; return; }
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
-  fetch('/api/auth/signup', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, name, password }),
-    credentials: 'same-origin',
-    signal: controller.signal,
-  })
-  .then(r => { clearTimeout(timer); return r.json(); })
-  .then(data => {
-    if (data.error) { el('authError').textContent = data.error; return; }
-    if (data.verificationSent) { el('authError').style.color = 'var(--success)'; el('authError').textContent = 'Verification email sent to ' + email + '. Check your inbox.'; return; }
-    if (data.success) { currentUser = data.user; showDrive(); updateUserInfo(data.user); loadFolder(''); loadStats(); }
-  })
-  .catch(err => {
-    clearTimeout(timer);
-    el('authError').textContent = err.name === 'AbortError' ? 'Request timed out' : 'Connection error';
-  });
-}
-el('authForm').addEventListener('submit', e => { e.preventDefault(); authMode === 'signin' ? doSignin() : doSignup(); });
-el('authSubmitBtn').addEventListener('click', e => { e.preventDefault(); doSignin(); });
+// === LOGOUT ===
 
 el('logoutBtn').addEventListener('click', () => {
   fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
-    .then(() => { currentUser = null; showLogin(); })
-    .catch(() => { currentUser = null; showLogin(); });
+    .then(() => { currentUser = null; window.location.href = '/'; })
+    .catch(() => { currentUser = null; window.location.href = '/'; });
 });
 
 // === NAVIGATION ===
