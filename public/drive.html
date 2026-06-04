@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drive</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="#1a73e8"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/><path d="M14 2v6h6" fill="none" stroke="#fff" stroke-width="2"/></svg>
+    </div>
+    <h1 class="login-title">Drive</h1>
+    <p class="login-subtitle" id="loginSubtitle">Sign in to your account</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="signin">Sign In</button>
+      <button class="auth-tab" data-tab="signup">Sign Up</button>
+    </div>
+    <form id="authForm" autocomplete="off">
+      <div id="signinFields">
+        <div class="auth-field">
+          <input type="email" id="signinEmail" placeholder="Email" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <input type="password" id="signinPassword" placeholder="Password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="auth-submit" id="authSubmitBtn">Sign In</button>
+      </div>
+      <div id="signupFields" style="display:none">
+        <div class="auth-field">
+          <input type="text" id="signupName" placeholder="Full Name" required autocomplete="name">
+        </div>
+        <div class="auth-field">
+          <input type="email" id="signupEmail" placeholder="Email" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <input type="password" id="signupPassword" placeholder="Password (min 4 chars)" required autocomplete="new-password">
+        </div>
+        <button type="submit" class="auth-submit" id="signupSubmitBtn">Sign Up</button>
+      </div>
+    </form>
+    <p class="login-error" id="authError"></p>
+  </div>
+</div>
+
+<!-- DRIVE APP -->
+<div id="driveApp" style="display:none">
+  <!-- sidebar -->
+  <div id="sidebar">
+    <div class="sidebar-header" style="padding:8px 12px 16px">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="#1a73e8"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/><path d="M14 2v6h6" fill="none" stroke="#fff" stroke-width="2"/></svg>
+        Drive
+      </div>
+    </div>
+    <button class="new-btn" id="newBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      New
+    </button>
+    <div class="sidebar-nav">
+      <a class="nav-item active" data-view="drive" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+        My Drive
+      </a>
+      <a class="nav-item" data-view="shared" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Shared
+      </a>
+      <a class="nav-item" data-view="search" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="11" cy="11" r="8" fill="none" stroke="currentColor" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2"/></svg>
+        Search
+      </a>
+      <a class="nav-item" data-view="trash" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        Trash
+      </a>
+      <a class="nav-item" id="adminNav" data-view="admin" href="#" style="display:none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/><path d="M12 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M12 13c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="none" stroke="currentColor" stroke-width="0.5"/></svg>
+        Admin
+      </a>
+      <a class="nav-item" id="settingsNav" data-view="settings" href="#">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        Settings
+      </a>
+    </div>
+    <div class="sidebar-storage">
+      <div class="storage-label">Storage</div>
+      <div class="storage-bar"><div class="storage-fill" id="storageFill"></div></div>
+      <div class="storage-text" id="storageText">Loading...</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-info">
+        <span class="user-name" id="userName">User</span>
+        <span class="user-email" id="userEmail">user@email.com</span>
+      </div>
+      <button class="logout-btn" id="logoutBtn" title="Sign out">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- main area -->
+  <div id="app">
+    <div id="main">
+      <!-- topbar -->
+      <div id="topbar">
+        <div class="breadcrumb" id="breadcrumb">
+          <span class="breadcrumb-item active">My Drive</span>
+        </div>
+        <div class="topbar-actions">
+          <div class="search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchInput" placeholder="Search files">
+          </div>
+          <button class="icon-btn" id="viewToggle" title="Toggle view">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          </button>
+        </div>
+      </div>
+      <!-- content -->
+      <div id="content">
+        <div id="view-container"></div>
+        <div id="settingsPanel" style="display:none;padding:24px;max-width:600px">
+          <h2 style="margin-bottom:20px">Settings</h2>
+          <h3 style="margin-bottom:12px;font-size:1rem;color:var(--text2)">Profile</h3>
+          <div class="auth-field"><input type="text" id="settingsName" placeholder="Your name"></div>
+          <button class="btn-primary" id="saveProfileBtn">Save</button>
+          <p id="profileStatus" style="font-size:0.85rem;margin-top:8px"></p>
+          <hr style="margin:24px 0;border:none;border-top:1px solid var(--border)">
+          <h3 style="margin-bottom:12px;font-size:1rem;color:var(--text2)">Change Password</h3>
+          <div class="auth-field"><input type="password" id="settingsCurrentPw" placeholder="Current password"></div>
+          <div class="auth-field"><input type="password" id="settingsNewPw" placeholder="New password (min 4 chars)"></div>
+          <button class="btn-primary" id="changePwBtn">Change Password</button>
+          <p id="passwordStatus" style="font-size:0.85rem;margin-top:8px"></p>
+        </div>
+        <div id="adminPanel" style="display:none;padding:24px;max-width:1000px">
+          <h2 style="margin-bottom:20px">Admin Dashboard</h2>
+          <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap" id="adminStats"></div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.85rem">
+            <thead><tr style="background:var(--sidebar-bg);text-align:left"><th style="padding:10px 12px">Email</th><th style="padding:10px 12px">Name</th><th style="padding:10px 12px">Verified</th><th style="padding:10px 12px">Role</th><th style="padding:10px 12px">Files</th><th style="padding:10px 12px">Storage</th><th style="padding:10px 12px">Created</th></tr></thead>
+            <tbody id="adminUsersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW MENU -->
+<div class="context-menu" id="newMenu" style="display:none;min-width:180px">
+  <div class="menu-item" data-action="folder">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="#f9d71c"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+    New Folder
+  </div>
+  <div class="menu-item" data-action="upload">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    File Upload
+  </div>
+  <div class="menu-item" data-action="uploadFolder">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+    Folder Upload
+  </div>
+</div>
+
+<!-- FILE INPUTS -->
+<input type="file" id="fileInput" multiple style="display:none">
+<input type="file" id="folderInput" multiple webkitdirectory style="display:none">
+
+<!-- CONTEXT MENU -->
+<div class="context-menu" id="contextMenu" style="display:none">
+  <div class="menu-item" data-action="preview">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    Preview
+  </div>
+  <div class="menu-item" data-action="download">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Download
+  </div>
+  <div class="menu-item" data-action="copylink">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+    Copy Download Link
+  </div>
+  <div class="menu-item" data-action="share">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    Share
+  </div>
+  <div class="menu-divider"></div>
+  <div class="menu-item" data-action="rename">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Rename
+  </div>
+  <div class="menu-item" data-action="move">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+    Move
+  </div>
+  <div class="menu-divider"></div>
+  <div class="menu-item danger" data-action="delete">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    Delete
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="modal" id="previewModal" style="display:none">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content modal-preview">
+    <div class="modal-header">
+      <span class="modal-title" id="previewTitle">Preview</span>
+      <button class="modal-close" id="previewClose">&times;</button>
+    </div>
+    <div class="modal-body" id="previewBody" style="padding:0;display:flex;align-items:center;justify-content:center"></div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal" id="shareModal" style="display:none">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content modal-sm">
+    <div class="modal-header">
+      <span class="modal-title">Share Link</span>
+      <button class="modal-close" id="shareClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p class="share-label">Anyone with this link can view the file</p>
+      <div class="share-link-box">
+        <input type="text" id="shareLinkInput" readonly>
+        <button class="btn-primary" id="copyLinkBtn">Copy</button>
+      </div>
+      <p class="share-hint" id="shareHint"></p>
+    </div>
+  </div>
+</div>
+
+<!-- MOVE MODAL -->
+<div class="modal" id="moveModal" style="display:none">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content modal-sm">
+    <div class="modal-header">
+      <span class="modal-title">Move to</span>
+      <button class="modal-close" id="moveCancel">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="move-tree" id="moveTree"></div>
+      <div class="move-actions">
+        <button class="btn-secondary" id="moveCancel">Cancel</button>
+        <button class="btn-primary" id="moveConfirm">Move</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
