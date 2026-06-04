@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drive — Secure Self-Hosted File Manager</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a14; color: #e0e0e0; line-height: 1.6; overflow-x: hidden; }
+a { color: #8ab4f8; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Nav */
+nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; background: rgba(26,26,46,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #2a2a3e; position: sticky; top: 0; z-index: 100; }
+.logo { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; color: #fff; }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { color: #aaa; font-size: 0.9rem; transition: color 0.2s; }
+.nav-links a:hover { color: #fff; text-decoration: none; }
+.btn { display: inline-block; padding: 8px 20px; border-radius: 6px; font-size: 0.9rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; font-family: inherit; }
+.btn-primary { background: #8ab4f8; color: #0f0f1a; }
+.btn-primary:hover { background: #7aa5e8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(138,180,248,0.3); }
+.btn-outline { background: transparent; border: 1px solid #8ab4f8; color: #8ab4f8; }
+.btn-outline:hover { background: rgba(138,180,248,0.1); }
+.btn-lg { padding: 14px 36px; font-size: 1.05rem; border-radius: 8px; }
+
+/* Hero */
+.hero { text-align: center; padding: 120px 24px 80px; max-width: 900px; margin: 0 auto; position: relative; }
+.hero::before { content: ''; position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(138,180,248,0.06) 0%, transparent 70%); pointer-events: none; }
+.hero h1 { font-size: 3.5rem; font-weight: 800; color: #fff; margin-bottom: 16px; letter-spacing: -1px; line-height: 1.15; }
+.hero h1 span { color: #8ab4f8; }
+.hero p { font-size: 1.2rem; color: #888; margin-bottom: 36px; max-width: 600px; margin-left: auto; margin-right: auto; }
+.hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.hero-features { display: flex; justify-content: center; gap: 40px; margin-top: 60px; flex-wrap: wrap; }
+.hero-feat { text-align: center; }
+.hero-feat .num { font-size: 1.8rem; font-weight: 700; color: #8ab4f8; display: block; }
+.hero-feat .label { font-size: 0.85rem; color: #666; }
+
+/* Features */
+.features { padding: 100px 24px; max-width: 1100px; margin: 0 auto; }
+.features h2 { text-align: center; font-size: 2.2rem; color: #fff; margin-bottom: 12px; }
+.features > p { text-align: center; color: #666; margin-bottom: 48px; font-size: 1.05rem; }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.feature-card { background: #14142a; border: 1px solid #2a2a3e; border-radius: 14px; padding: 32px; transition: all 0.3s; }
+.feature-card:hover { border-color: #8ab4f8; transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.feature-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(138,180,248,0.08); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+.feature-icon svg { width: 24px; height: 24px; stroke: #8ab4f8; fill: none; stroke-width: 2; }
+.feature-card h3 { color: #fff; margin-bottom: 8px; font-size: 1.1rem; }
+.feature-card p { color: #777; font-size: 0.9rem; line-height: 1.7; }
+
+/* Auth Section */
+.auth-section { padding: 80px 24px 100px; background: #0e0e20; }
+.auth-inner { max-width: 420px; margin: 0 auto; }
+.auth-section h2 { text-align: center; font-size: 2.2rem; color: #fff; margin-bottom: 8px; }
+.auth-section > p { text-align: center; color: #666; margin-bottom: 32px; font-size: 1.05rem; }
+.auth-card { background: #14142a; border: 1px solid #2a2a3e; border-radius: 14px; padding: 36px; }
+.auth-tabs { display: flex; margin-bottom: 24px; border-bottom: 1px solid #2a2a3e; }
+.auth-tab { flex: 1; padding: 10px; text-align: center; background: none; border: none; color: #666; font-size: 0.95rem; font-family: inherit; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.auth-tab.active { color: #8ab4f8; border-bottom-color: #8ab4f8; }
+.auth-tab:hover { color: #aaa; }
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+.auth-field { display: flex; flex-direction: column; gap: 4px; }
+.auth-field label { font-size: 0.85rem; color: #888; }
+.auth-field input { padding: 10px 14px; border-radius: 8px; border: 1px solid #2a2a3e; background: #0a0a14; color: #fff; font-size: 0.95rem; font-family: inherit; outline: none; transition: border-color 0.2s; }
+.auth-field input:focus { border-color: #8ab4f8; }
+.auth-submit { padding: 11px; border-radius: 8px; background: #8ab4f8; color: #0f0f1a; font-weight: 600; font-size: 0.95rem; border: none; cursor: pointer; font-family: inherit; transition: all 0.2s; margin-top: 4px; }
+.auth-submit:hover { background: #7aa5e8; }
+.google-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px; border-radius: 8px; background: #fff; color: #333; font-weight: 500; font-size: 0.9rem; border: none; cursor: pointer; font-family: inherit; transition: all 0.2s; margin-top: 4px; text-decoration: none; width: 100%; }
+.google-btn:hover { background: #f5f5f5; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: #555; font-size: 0.8rem; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #2a2a3e; }
+.auth-error { text-align: center; font-size: 0.85rem; min-height: 1.2em; color: #f44336; margin-top: 4px; }
+
+/* Footer */
+footer { text-align: center; padding: 32px 24px; color: #444; font-size: 0.85rem; border-top: 1px solid #2a2a3e; }
+footer a { color: #666; }
+footer a:hover { color: #8ab4f8; text-decoration: none; }
+
+@media (max-width: 600px) {
+  nav { padding: 12px 16px; }
+  .nav-links { gap: 12px; }
+  .hero { padding: 80px 16px 40px; }
+  .hero h1 { font-size: 2.2rem; }
+  .hero-features { gap: 20px; }
+  .features { padding: 60px 16px; }
+  .auth-section { padding: 60px 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+    Drive
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#auth">Sign In</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>Your files, <span>anywhere</span>. <br>Yours only.</h1>
+  <p>Self-hosted file manager with per-user storage, unlimited uploads, and secure sharing.</p>
+  <div class="hero-btns">
+    <a href="#auth" class="btn btn-primary btn-lg">Get Started — It's Free</a>
+    <a href="#features" class="btn btn-outline btn-lg">Learn More</a>
+  </div>
+  <div class="hero-features">
+    <div class="hero-feat"><span class="num">Unlimited</span><span class="label">File Size</span></div>
+    <div class="hero-feat"><span class="num">256-bit</span><span class="label">Encryption</span></div>
+    <div class="hero-feat"><span class="num">Zero</span><span class="label">Third Parties</span></div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <h2>Everything you need</h2>
+  <p>Built for speed, security, and simplicity — all on your own server.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+      <h3>Unlimited Uploads</h3>
+      <p>Upload files of any size with streaming. No file size limits, no storage caps — only your disk.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+      <h3>Share Securely</h3>
+      <p>Generate share links for files and folders. Share with anyone — no account needed to view.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <h3>Private by Default</h3>
+      <p>Password-protected accounts with email verification. Each user gets isolated storage.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+      <h3>Preview Anything</h3>
+      <p>Preview PDFs, images, video, audio, and code directly in the browser. No downloads needed.</p>
+    </div>
+  </div>
+</section>
+
+<section class="auth-section" id="auth">
+  <div class="auth-inner">
+    <h2>Welcome back</h2>
+    <p>Sign in or create an account to get started.</p>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-auth-tab="signin">Sign In</button>
+        <button class="auth-tab" data-auth-tab="signup">Sign Up</button>
+      </div>
+      <form id="authForm" autocomplete="off">
+        <div class="auth-form" id="signinFields">
+          <div class="auth-field">
+            <label>Email</label>
+            <input type="email" id="signinEmail" placeholder="your@email.com" required autocomplete="email">
+          </div>
+          <div class="auth-field">
+            <label>Password</label>
+            <input type="password" id="signinPassword" placeholder="Enter your password" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="auth-submit" id="authSubmitBtn">Sign In</button>
+          <div class="divider">or</div>
+          <a href="/api/auth/google" class="google-btn">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.94 23.94 0 0 0 0 24c0 3.77.87 7.35 2.56 10.56l7.98-5.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/></svg>
+            Sign in with Google
+          </a>
+        </div>
+        <div class="auth-form" id="signupFields" style="display:none">
+          <div class="auth-field">
+            <label>Full Name</label>
+            <input type="text" id="signupName" placeholder="John Doe" required autocomplete="name">
+          </div>
+          <div class="auth-field">
+            <label>Email</label>
+            <input type="email" id="signupEmail" placeholder="your@email.com" required autocomplete="email">
+          </div>
+          <div class="auth-field">
+            <label>Password</label>
+            <input type="password" id="signupPassword" placeholder="At least 4 characters" required autocomplete="new-password">
+          </div>
+          <button type="submit" class="auth-submit" id="signupSubmitBtn">Sign Up</button>
+          <div class="divider">or</div>
+          <a href="/api/auth/google" class="google-btn">
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.94 23.94 0 0 0 0 24c0 3.77.87 7.35 2.56 10.56l7.98-5.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/></svg>
+            Sign up with Google
+          </a>
+        </div>
+      </form>
+      <p id="authError" class="auth-error"></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Drive — Self-hosted file manager. Built with <a href="https://nodejs.org" target="_blank">Node.js</a>.</p>
+</footer>
+
+<script>
+let authMode = 'signin';
+
+document.querySelectorAll('[data-auth-tab]').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('[data-auth-tab]').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    authMode = tab.dataset.authTab;
+    document.getElementById('signinFields').style.display = authMode === 'signin' ? 'flex' : 'none';
+    document.getElementById('signupFields').style.display = authMode === 'signup' ? 'flex' : 'none';
+    document.getElementById('authError').textContent = '';
+  });
+});
+
+function el(id) { return document.getElementById(id); }
+
+function doSignin() {
+  const email = el('signinEmail').value.trim();
+  const password = el('signinPassword').value;
+  el('authError').textContent = '';
+  el('authError').style.color = '';
+  if (!email || !password) { el('authError').textContent = 'Please fill in all fields'; return; }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  fetch('/api/auth/signin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+    credentials: 'same-origin',
+    signal: controller.signal,
+  })
+  .then(r => { clearTimeout(timer); return r.json(); })
+  .then(data => {
+    if (data.error) { el('authError').textContent = data.error; return; }
+    if (data.success) window.location.href = '/drive';
+  })
+  .catch(err => {
+    clearTimeout(timer);
+    el('authError').textContent = err.name === 'AbortError' ? 'Request timed out' : 'Connection error';
+  });
+}
+
+function doSignup() {
+  const name = el('signupName').value.trim();
+  const email = el('signupEmail').value.trim();
+  const password = el('signupPassword').value;
+  el('authError').textContent = '';
+  if (!name || !email || !password) { el('authError').textContent = 'Please fill in all fields'; return; }
+  if (password.length < 4) { el('authError').textContent = 'Password must be at least 4 characters'; return; }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  fetch('/api/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, name, password }),
+    credentials: 'same-origin',
+    signal: controller.signal,
+  })
+  .then(r => { clearTimeout(timer); return r.json(); })
+  .then(data => {
+    if (data.error) { el('authError').textContent = data.error; return; }
+    if (data.verificationSent) { el('authError').style.color = '#4caf50'; el('authError').textContent = 'Verification email sent to ' + email + '. Check your inbox.'; return; }
+    if (data.success) window.location.href = '/drive';
+  })
+  .catch(err => {
+    clearTimeout(timer);
+    el('authError').textContent = err.name === 'AbortError' ? 'Request timed out' : 'Connection error';
+  });
+}
+
+el('authForm').addEventListener('submit', e => {
+  e.preventDefault();
+  authMode === 'signin' ? doSignin() : doSignup();
+});
+el('authSubmitBtn').addEventListener('click', e => { e.preventDefault(); doSignin(); });
+el('signupSubmitBtn').addEventListener('click', e => { e.preventDefault(); doSignup(); });
+</script>
+</body>
+</html>

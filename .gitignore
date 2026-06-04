@@ -1,0 +1,5 @@
+drive.db
+storage/
+*.json
+node_modules/
+.env
