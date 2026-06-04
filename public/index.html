@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Drive — Secure Self-Hosted File Manager</title>
+<title>Drive — Unlimited File Uploads</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a14; color: #e0e0e0; line-height: 1.6; overflow-x: hidden; }
 a { color: #8ab4f8; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-/* Nav */
 nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; background: rgba(26,26,46,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #2a2a3e; position: sticky; top: 0; z-index: 100; }
 .logo { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; color: #fff; }
 .nav-links { display: flex; gap: 24px; align-items: center; }
@@ -23,35 +22,45 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .btn-outline:hover { background: rgba(138,180,248,0.1); }
 .btn-lg { padding: 14px 36px; font-size: 1.05rem; border-radius: 8px; }
 
-/* Hero */
-.hero { text-align: center; padding: 120px 24px 80px; max-width: 900px; margin: 0 auto; position: relative; }
+.hero { text-align: center; padding: 100px 24px 60px; max-width: 900px; margin: 0 auto; position: relative; }
 .hero::before { content: ''; position: absolute; top: -200px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(138,180,248,0.06) 0%, transparent 70%); pointer-events: none; }
-.hero h1 { font-size: 3.5rem; font-weight: 800; color: #fff; margin-bottom: 16px; letter-spacing: -1px; line-height: 1.15; }
+.hero h1 { font-size: 3.2rem; font-weight: 800; color: #fff; margin-bottom: 12px; letter-spacing: -1px; line-height: 1.15; }
 .hero h1 span { color: #8ab4f8; }
-.hero p { font-size: 1.2rem; color: #888; margin-bottom: 36px; max-width: 600px; margin-left: auto; margin-right: auto; }
+.hero p { font-size: 1.15rem; color: #888; margin-bottom: 32px; max-width: 600px; margin-left: auto; margin-right: auto; }
 .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-.hero-features { display: flex; justify-content: center; gap: 40px; margin-top: 60px; flex-wrap: wrap; }
-.hero-feat { text-align: center; }
-.hero-feat .num { font-size: 1.8rem; font-weight: 700; color: #8ab4f8; display: block; }
-.hero-feat .label { font-size: 0.85rem; color: #666; }
+.hero-visual { margin: 40px auto 0; max-width: 700px; background: #14142a; border: 1px solid #2a2a3e; border-radius: 16px; padding: 32px; text-align: left; }
+.hero-visual .icon-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; color: #666; font-size: 0.9rem; }
+.hero-visual .icon-row svg { flex-shrink: 0; }
+.hero-visual .upload-area { border: 2px dashed #2a2a3e; border-radius: 12px; padding: 40px; text-align: center; color: #555; transition: all 0.3s; cursor: default; }
+.hero-visual .upload-area:hover { border-color: #8ab4f8; background: rgba(138,180,248,0.03); }
+.hero-visual .upload-area svg { margin-bottom: 12px; opacity: 0.4; }
+.hero-visual .upload-area p { font-size: 1rem; color: #666; }
+.hero-visual .upload-area .badge { display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 20px; background: rgba(138,180,248,0.1); color: #8ab4f8; font-size: 0.8rem; font-weight: 500; }
 
-/* Features */
-.features { padding: 100px 24px; max-width: 1100px; margin: 0 auto; }
-.features h2 { text-align: center; font-size: 2.2rem; color: #fff; margin-bottom: 12px; }
-.features > p { text-align: center; color: #666; margin-bottom: 48px; font-size: 1.05rem; }
+.features { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+.features h2 { text-align: center; font-size: 2rem; color: #fff; margin-bottom: 8px; }
+.features > p { text-align: center; color: #666; margin-bottom: 40px; font-size: 1rem; }
 .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-.feature-card { background: #14142a; border: 1px solid #2a2a3e; border-radius: 14px; padding: 32px; transition: all 0.3s; }
+.feature-card { background: #14142a; border: 1px solid #2a2a3e; border-radius: 14px; padding: 28px; transition: all 0.3s; }
 .feature-card:hover { border-color: #8ab4f8; transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-.feature-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(138,180,248,0.08); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
-.feature-icon svg { width: 24px; height: 24px; stroke: #8ab4f8; fill: none; stroke-width: 2; }
-.feature-card h3 { color: #fff; margin-bottom: 8px; font-size: 1.1rem; }
+.feature-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(138,180,248,0.08); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.feature-icon svg { width: 22px; height: 22px; stroke: #8ab4f8; fill: none; stroke-width: 2; }
+.feature-card h3 { color: #fff; margin-bottom: 6px; font-size: 1.05rem; }
 .feature-card p { color: #777; font-size: 0.9rem; line-height: 1.7; }
 
-/* Auth Section */
-.auth-section { padding: 80px 24px 100px; background: #0e0e20; }
+.how { padding: 80px 24px; background: #0e0e20; }
+.how-inner { max-width: 800px; margin: 0 auto; text-align: center; }
+.how h2 { font-size: 2rem; color: #fff; margin-bottom: 40px; }
+.how-steps { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+.how-step { flex: 1; min-width: 200px; max-width: 260px; }
+.how-step .step-num { width: 40px; height: 40px; border-radius: 50%; background: rgba(138,180,248,0.12); color: #8ab4f8; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; margin: 0 auto 12px; }
+.how-step h3 { color: #fff; font-size: 1rem; margin-bottom: 6px; }
+.how-step p { color: #666; font-size: 0.85rem; }
+
+.auth-section { padding: 80px 24px 100px; }
 .auth-inner { max-width: 420px; margin: 0 auto; }
-.auth-section h2 { text-align: center; font-size: 2.2rem; color: #fff; margin-bottom: 8px; }
-.auth-section > p { text-align: center; color: #666; margin-bottom: 32px; font-size: 1.05rem; }
+.auth-section h2 { text-align: center; font-size: 2rem; color: #fff; margin-bottom: 8px; }
+.auth-section > p { text-align: center; color: #666; margin-bottom: 32px; font-size: 1rem; }
 .auth-card { background: #14142a; border: 1px solid #2a2a3e; border-radius: 14px; padding: 36px; }
 .auth-tabs { display: flex; margin-bottom: 24px; border-bottom: 1px solid #2a2a3e; }
 .auth-tab { flex: 1; padding: 10px; text-align: center; background: none; border: none; color: #666; font-size: 0.95rem; font-family: inherit; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
@@ -70,7 +79,6 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #2a2a3e; }
 .auth-error { text-align: center; font-size: 0.85rem; min-height: 1.2em; color: #f44336; margin-top: 4px; }
 
-/* Footer */
 footer { text-align: center; padding: 32px 24px; color: #444; font-size: 0.85rem; border-top: 1px solid #2a2a3e; }
 footer a { color: #666; }
 footer a:hover { color: #8ab4f8; text-decoration: none; }
@@ -78,11 +86,13 @@ footer a:hover { color: #8ab4f8; text-decoration: none; }
 @media (max-width: 600px) {
   nav { padding: 12px 16px; }
   .nav-links { gap: 12px; }
-  .hero { padding: 80px 16px 40px; }
-  .hero h1 { font-size: 2.2rem; }
-  .hero-features { gap: 20px; }
+  .hero { padding: 60px 16px 40px; }
+  .hero h1 { font-size: 2rem; }
+  .hero-visual { padding: 20px; }
+  .hero-visual .upload-area { padding: 24px 16px; }
   .features { padding: 60px 16px; }
   .auth-section { padding: 60px 16px; }
+  .how-steps { flex-direction: column; align-items: center; }
 }
 </style>
 </head>
@@ -95,55 +105,95 @@ footer a:hover { color: #8ab4f8; text-decoration: none; }
   </div>
   <div class="nav-links">
     <a href="#features">Features</a>
+    <a href="#how">How It Works</a>
     <a href="#auth">Sign In</a>
   </div>
 </nav>
 
 <section class="hero">
-  <h1>Your files, <span>anywhere</span>. <br>Yours only.</h1>
-  <p>Self-hosted file manager with per-user storage, unlimited uploads, and secure sharing.</p>
+  <h1>Upload files &amp; folders. <span>No limits.</span></h1>
+  <p>Drag, drop, and stream files of any size. No upload caps, no storage quotas — just your disk.</p>
   <div class="hero-btns">
-    <a href="#auth" class="btn btn-primary btn-lg">Get Started — It's Free</a>
-    <a href="#features" class="btn btn-outline btn-lg">Learn More</a>
+    <a href="#auth" class="btn btn-primary btn-lg">Start Uploading — Free</a>
+    <a href="#features" class="btn btn-outline btn-lg">See Features</a>
   </div>
-  <div class="hero-features">
-    <div class="hero-feat"><span class="num">Unlimited</span><span class="label">File Size</span></div>
-    <div class="hero-feat"><span class="num">256-bit</span><span class="label">Encryption</span></div>
-    <div class="hero-feat"><span class="num">Zero</span><span class="label">Third Parties</span></div>
+  <div class="hero-visual">
+    <div class="icon-row">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8ab4f8" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>
+      <span>No file size limits — stream uploads of any size</span>
+    </div>
+    <div class="upload-area">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <p>Drag &amp; drop files and folders here</p>
+      <span class="badge">Unlimited size · Unlimited files</span>
+    </div>
   </div>
 </section>
 
 <section class="features" id="features">
-  <h2>Everything you need</h2>
-  <p>Built for speed, security, and simplicity — all on your own server.</p>
+  <h2>Built for unlimited uploads</h2>
+  <p>Everything you need to store, share, and preview your files — all self-hosted.</p>
   <div class="features-grid">
     <div class="feature-card">
-      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
       <h3>Unlimited Uploads</h3>
-      <p>Upload files of any size with streaming. No file size limits, no storage caps — only your disk.</p>
+      <p>Upload files of any size — 1 MB or 100 GB. Streaming multipart upload means no memory limits, no cap on how many files.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg></div>
+      <h3>Upload Whole Folders</h3>
+      <p>Upload entire directories with one click. Your folder structure is preserved automatically on the server.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+      <h3>Preview in Browser</h3>
+      <p>Preview PDFs, images, video, audio, and code directly — no downloads needed for common formats.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
-      <h3>Share Securely</h3>
-      <p>Generate share links for files and folders. Share with anyone — no account needed to view.</p>
+      <h3>Share Anything</h3>
+      <p>Create share links for files and folders. Share with anyone — no account needed to view.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-      <h3>Private by Default</h3>
-      <p>Password-protected accounts with email verification. Each user gets isolated storage.</p>
+      <h3>Private &amp; Secure</h3>
+      <p>Password-protected accounts with per-user isolated storage. No data leaves your server.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-      <h3>Preview Anything</h3>
-      <p>Preview PDFs, images, video, audio, and code directly in the browser. No downloads needed.</p>
+      <h3>Self-Hosted</h3>
+      <p>Runs on your own server with zero npm dependencies. Pure Node.js, SQLite, and your disk.</p>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="how-inner">
+    <h2>How it works</h2>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <h3>Create an account</h3>
+        <p>Sign up with your email and password. Takes 10 seconds.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <h3>Upload files &amp; folders</h3>
+        <p>Drag &amp; drop or use the upload button. No size limits.</p>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <h3>Access from anywhere</h3>
+        <p>Preview, share, download — all from your browser.</p>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="auth-section" id="auth">
   <div class="auth-inner">
-    <h2>Welcome back</h2>
-    <p>Sign in or create an account to get started.</p>
+    <h2>Get started</h2>
+    <p>Sign in or create an account to start uploading.</p>
     <div class="auth-card">
       <div class="auth-tabs">
         <button class="auth-tab active" data-auth-tab="signin">Sign In</button>
@@ -194,7 +244,7 @@ footer a:hover { color: #8ab4f8; text-decoration: none; }
 </section>
 
 <footer>
-  <p>Drive — Self-hosted file manager. Built with <a href="https://nodejs.org" target="_blank">Node.js</a>.</p>
+  <p>Drive — Self-hosted file manager. <a href="https://nodejs.org" target="_blank">Node.js</a>.</p>
 </footer>
 
 <script>
@@ -267,7 +317,6 @@ function doSignup() {
   });
 }
 
-// Auto-redirect to drive if already signed in
 fetch('/api/auth/me', { credentials: 'same-origin' }).then(r => r.json()).then(d => {
   if (d.authenticated) window.location.href = '/drive';
 }).catch(() => {});
@@ -277,12 +326,10 @@ el('authForm').addEventListener('submit', e => {
   authMode === 'signin' ? doSignin() : doSignup();
 });
 
-// Show GitHub button only if configured
 fetch('/api/auth/github/config').then(r => r.json()).then(cfg => {
   if (!cfg.enabled) document.querySelectorAll('.github-btn').forEach(b => b.style.display = 'none');
 }).catch(() => {});
 
-// Show error from redirect
 const params = new URLSearchParams(window.location.search);
 if (params.get('error') === 'github_not_configured') {
   el('authError').textContent = 'GitHub Sign-In is not configured yet. Use email instead.';
