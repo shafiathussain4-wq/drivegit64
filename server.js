@@ -1066,8 +1066,7 @@ const server = http.createServer(async (req, res) => {
 
         // === SERVE STATIC (public) ===
         let fp;
-        if (pathname === '/drive' || pathname === '/drive/') fp = '/drive.html';
-        else if (pathname === '/') fp = '/index.html';
+        if (pathname === '/' || pathname === '/drive' || pathname === '/drive/') fp = '/drive.html';
         else fp = pathname;
         const staticFile = safeResolve(__dirname, 'public' + fp);
         if (staticFile && fs.existsSync(staticFile) && fs.statSync(staticFile).isFile()) {

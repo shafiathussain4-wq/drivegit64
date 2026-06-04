@@ -28,13 +28,14 @@ const API = {
 
 // === AUTH ===
 let currentUser = null;
+let authMode = 'signin';
 
 function checkAuth() {
   return fetch('/api/auth/me', { credentials: 'same-origin' })
     .then(r => r.json())
     .then(data => {
       if (data.authenticated === false || data.error) {
-        window.location.href = '/';
+        showLogin();
         return false;
       }
       currentUser = data;
@@ -44,18 +45,90 @@ function checkAuth() {
       return true;
     })
     .catch(() => {
-      window.location.href = '/';
+      showLogin();
       return false;
     });
 }
 
 function showLogin() {
-  window.location.href = '/';
+  el('loginScreen').style.display = 'flex';
+  el('driveApp').style.display = 'none';
 }
 
 function showDrive() {
+  el('loginScreen').style.display = 'none';
   el('driveApp').style.display = 'flex';
 }
+
+// Auth tabs
+document.querySelectorAll('[data-tab]').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    authMode = tab.dataset.tab;
+    el('signinFields').style.display = authMode === 'signin' ? 'block' : 'none';
+    el('signupFields').style.display = authMode === 'signup' ? 'block' : 'none';
+    el('loginSubtitle').textContent = authMode === 'signin' ? 'Sign in to your account' : 'Create a new account';
+    el('authError').textContent = '';
+  });
+});
+
+function doSignin() {
+  const email = el('signinEmail').value.trim();
+  const password = el('signinPassword').value;
+  el('authError').textContent = '';
+  el('authError').style.color = '';
+  if (!email || !password) { el('authError').textContent = 'Please fill in all fields'; return; }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  fetch('/api/auth/signin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+    credentials: 'same-origin',
+    signal: controller.signal,
+  })
+  .then(r => { clearTimeout(timer); return r.json(); })
+  .then(data => {
+    if (data.error) { el('authError').textContent = data.error; return; }
+    if (data.success) { currentUser = data.user; showDrive(); updateUserInfo(data.user); loadFolder(''); loadStats(); }
+  })
+  .catch(err => {
+    clearTimeout(timer);
+    el('authError').textContent = err.name === 'AbortError' ? 'Request timed out' : 'Connection error';
+  });
+}
+
+function doSignup() {
+  const name = el('signupName').value.trim();
+  const email = el('signupEmail').value.trim();
+  const password = el('signupPassword').value;
+  el('authError').textContent = '';
+  if (!name || !email || !password) { el('authError').textContent = 'Please fill in all fields'; return; }
+  if (password.length < 4) { el('authError').textContent = 'Password must be at least 4 characters'; return; }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  fetch('/api/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, name, password }),
+    credentials: 'same-origin',
+    signal: controller.signal,
+  })
+  .then(r => { clearTimeout(timer); return r.json(); })
+  .then(data => {
+    if (data.error) { el('authError').textContent = data.error; return; }
+    if (data.verificationSent) { el('authError').style.color = '#4caf50'; el('authError').textContent = 'Verification email sent to ' + email + '. Check your inbox.'; return; }
+    if (data.success) { currentUser = data.user; showDrive(); updateUserInfo(data.user); loadFolder(''); loadStats(); }
+  })
+  .catch(err => {
+    clearTimeout(timer);
+    el('authError').textContent = err.name === 'AbortError' ? 'Request timed out' : 'Connection error';
+  });
+}
+
+el('authForm').addEventListener('submit', e => { e.preventDefault(); authMode === 'signin' ? doSignin() : doSignup(); });
+el('authSubmitBtn').addEventListener('click', e => { e.preventDefault(); doSignin(); });
 
 function updateUserInfo(user) {
   el('userName').textContent = user.name;
@@ -66,8 +139,8 @@ function updateUserInfo(user) {
 
 el('logoutBtn').addEventListener('click', () => {
   fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' })
-    .then(() => { currentUser = null; window.location.href = '/'; })
-    .catch(() => { currentUser = null; window.location.href = '/'; });
+    .then(() => { currentUser = null; showLogin(); })
+    .catch(() => { currentUser = null; showLogin(); });
 });
 
 // === NAVIGATION ===

@@ -281,7 +281,7 @@ function doSignin() {
   .then(r => { clearTimeout(timer); return r.json(); })
   .then(data => {
     if (data.error) { el('authError').textContent = data.error; return; }
-    if (data.success) window.location.href = '/drive';
+    if (data.success) window.location.href = '/';
   })
   .catch(err => {
     clearTimeout(timer);
@@ -309,7 +309,7 @@ function doSignup() {
   .then(data => {
     if (data.error) { el('authError').textContent = data.error; return; }
     if (data.verificationSent) { el('authError').style.color = '#4caf50'; el('authError').textContent = 'Verification email sent to ' + email + '. Check your inbox.'; return; }
-    if (data.success) window.location.href = '/drive';
+    if (data.success) window.location.href = '/';
   })
   .catch(err => {
     clearTimeout(timer);
@@ -318,7 +318,7 @@ function doSignup() {
 }
 
 fetch('/api/auth/me', { credentials: 'same-origin' }).then(r => r.json()).then(d => {
-  if (d.authenticated) window.location.href = '/drive';
+  if (d.authenticated) window.location.href = '/';
 }).catch(() => {});
 
 el('authForm').addEventListener('submit', e => {
