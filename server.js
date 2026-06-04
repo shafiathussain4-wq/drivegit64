@@ -642,9 +642,14 @@ const server = http.createServer(async (req, res) => {
             return respond(res, 200, { success: true });
         }
 
+        // GET /api/auth/google/config — check if Google OAuth is configured
+        if (pathname === '/api/auth/google/config' && req.method === 'GET') {
+            return respond(res, 200, { enabled: !!GOOGLE_CLIENT_ID });
+        }
+
         // GET /api/auth/google — redirect to Google OAuth
         if (pathname === '/api/auth/google' && req.method === 'GET') {
-            if (!GOOGLE_CLIENT_ID) return sendError(res, 400, 'Google Sign-In not configured');
+            if (!GOOGLE_CLIENT_ID) { res.writeHead(302, { Location: '/?error=google_not_configured' }); res.end(); return; }
             const authUrl = getGoogleAuthUrl(req.headers.host || 'localhost:3000');
             res.writeHead(302, { Location: authUrl });
             res.end();

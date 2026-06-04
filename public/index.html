@@ -270,8 +270,17 @@ el('authForm').addEventListener('submit', e => {
   e.preventDefault();
   authMode === 'signin' ? doSignin() : doSignup();
 });
-el('authSubmitBtn').addEventListener('click', e => { e.preventDefault(); doSignin(); });
-el('signupSubmitBtn').addEventListener('click', e => { e.preventDefault(); doSignup(); });
+
+// Show Google button only if configured
+fetch('/api/auth/google/config').then(r => r.json()).then(cfg => {
+  if (!cfg.enabled) document.querySelectorAll('.google-btn').forEach(b => b.style.display = 'none');
+}).catch(() => {});
+
+// Show error from Google redirect
+const params = new URLSearchParams(window.location.search);
+if (params.get('error') === 'google_not_configured') {
+  el('authError').textContent = 'Google Sign-In is not configured yet. Use email instead.';
+}
 </script>
 </body>
 </html>
